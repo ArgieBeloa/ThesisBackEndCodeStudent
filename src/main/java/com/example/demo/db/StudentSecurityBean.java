@@ -90,7 +90,7 @@ public class StudentSecurityBean {
                 "http://192.168.254.103:8081",
                 "http://192.168.254.103:19006",
                 "http://localhost:19006",
-                "https://capstonestudentloginapi-1.onrender.com"
+                "https://thesisbackendcodestudent.onrender.com"
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
