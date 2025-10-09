@@ -5,6 +5,15 @@ public class StudentEventAttended {
     private String eventId;
     private String eventTitle;
     private String studentDateAttended;
+    private boolean evaluated;
+
+    public boolean isEvaluated() {
+        return evaluated;
+    }
+
+    public void setEvaluated(boolean evaluated) {
+        this.evaluated = evaluated;
+    }
 
     public String getEventId() {
         return eventId;

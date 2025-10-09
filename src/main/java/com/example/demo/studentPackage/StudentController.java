@@ -62,6 +62,16 @@ public StudentModel updateEventStatus(
 ) {
     return studentService.updateEventStatus(studentId, eventId, isAttended, isEvaluated);
 }
+    @PutMapping("/{studentId}/event/{eventId}/update-evaluated")
+    public StudentModel updateEventEvaluatedStatus(
+            @PathVariable String studentId,
+            @PathVariable String eventId,
+            @RequestParam boolean evaluated
+    ) {
+        return studentService.updateEventEvaluatedStatus(studentId, eventId, evaluated);
+//        http://localhost:8080/api/students/66f9b2e5a12d3b/event/6731a5b7e0a45/update-evaluated?evaluated=true
+    }
+
 //    update student event attended
 
 //@PostMapping("/{id}/events")

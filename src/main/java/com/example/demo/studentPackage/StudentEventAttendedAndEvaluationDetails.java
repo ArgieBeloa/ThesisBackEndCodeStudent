@@ -4,8 +4,8 @@ public class StudentEventAttendedAndEvaluationDetails {
     private String eventId;
     private String eventTitle;
     private String eventDateAndTime;
-    private Boolean isAttended;
-    private Boolean isEvaluated;
+    private Boolean attended;
+    private Boolean evaluated;
 
     public String getEventDateAndTime() {
         return eventDateAndTime;
@@ -32,18 +32,18 @@ public class StudentEventAttendedAndEvaluationDetails {
     }
 
     public Boolean getAttended() {
-        return isAttended;
+        return attended;
     }
 
     public void setAttended(Boolean attended) {
-        isAttended = attended;
+        this.attended = attended;
     }
 
     public Boolean getEvaluated() {
-        return isEvaluated;
+        return evaluated;
     }
 
     public void setEvaluated(Boolean evaluated) {
-        isEvaluated = evaluated;
+        this.evaluated = evaluated;
     }
 }

@@ -178,8 +178,8 @@ public void addStudentEventAttendedAndEvaluationDetails(String studentId, List<S
 
     mongoTemplate.updateFirst(query, update, StudentModel.class);
 }
-//update the student event attended and evaluated
 
+//PUT
         public StudentModel updateEventStatus(String studentId, String eventId, Boolean isAttended, Boolean isEvaluated) {
             Optional<StudentModel> optionalStudent = studentRepository.findById(studentId);
 
@@ -233,6 +233,26 @@ public StudentModel updateNotification(String studentId, int newNotificationCoun
         throw new RuntimeException("Student with id " + studentId + " not found");
     }
 }
+
+    public StudentModel updateEventEvaluatedStatus(String studentId, String eventId, boolean evaluated) {
+        Optional<StudentModel> optionalStudent = studentRepository.findById(studentId);
+        if (optionalStudent.isEmpty()) {
+            throw new RuntimeException("Student not found with ID: " + studentId);
+        }
+
+        StudentModel student = optionalStudent.get();
+
+        if (student.getStudentEventAttended() != null) {
+            for (StudentEventAttended attendedEvent : student.getStudentEventAttended()) {
+                if (attendedEvent.getEventId().equals(eventId)) {
+                    attendedEvent.setEvaluated(evaluated);
+                    break;
+                }
+            }
+        }
+
+        return studentRepository.save(student);
+    }
 
 
 
