@@ -114,11 +114,11 @@ public StudentModel updateEventStatus(
 
 
     //    delete upcoming student event (specific)
-    @DeleteMapping("/{studentNumber}/delete/upcomingEvents/{eventId}")
-    public ResponseEntity<String> deleteSpecificUpcomingEvents(@PathVariable String studentNumber, @PathVariable String eventId){
+    @DeleteMapping("/{studentId}/delete/upcomingEvents/{eventId}")
+    public ResponseEntity<String> deleteSpecificUpcomingEvents(@PathVariable String studentId, @PathVariable String eventId){
 
         try {
-            studentService.deleteSpecificUpcomingEvent(studentNumber, eventId);
+            studentService.deleteSpecificUpcomingEvent(studentId, eventId);
             return  new ResponseEntity<>("Event remove successfully",HttpStatus.OK);
         }catch (IllegalArgumentException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -129,11 +129,11 @@ public StudentModel updateEventStatus(
     }
 
     //    delete upcoming student event (specific)
-    @DeleteMapping("/{studentNumber}/delete/studentNotification/{eventId}")
-    public ResponseEntity<String> deleteSpecificStudentNotification(@PathVariable String studentNumber, @PathVariable String eventId){
+    @DeleteMapping("/{studentId}/delete/studentNotification/{eventId}")
+    public ResponseEntity<String> deleteSpecificStudentNotification(@PathVariable String studentId, @PathVariable String eventId){
 
         try {
-            studentService.deleteSpecificStudentNotification(studentNumber, eventId);
+            studentService.deleteSpecificStudentNotification(studentId, eventId);
             return  new ResponseEntity<>("Notification remove successfully",HttpStatus.OK);
         }catch (IllegalArgumentException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
