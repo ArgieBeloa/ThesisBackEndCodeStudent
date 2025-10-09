@@ -257,16 +257,16 @@ public StudentModel updateNotification(String studentId, int newNotificationCoun
 
 
   //delete upcoming events specific object
-    public void deleteSpecificUpcomingEvent(String studentNumber, String eventId) {
+    public void deleteSpecificUpcomingEvent(String studentId, String eventId) {
 
 // Inject mongoTemplate and use this method:
 
-            if (studentNumber == null || eventId == null || studentNumber.isEmpty() || eventId.isEmpty()) {
+            if (studentId == null || eventId == null || studentId.isEmpty() || eventId.isEmpty()) {
                 throw new IllegalArgumentException("Student ID and Event ID cannot be null or empty");
             }
 
             // Match the student document
-            Query query = new Query(Criteria.where("studentNumber").is(studentNumber));
+            Query query = new Query(Criteria.where("id").is(studentId));
 
             // Match subdocuments in the array that contain the eventId
             BasicDBObject eventToRemove = new BasicDBObject("eventId", eventId);
@@ -278,12 +278,12 @@ public StudentModel updateNotification(String studentId, int newNotificationCoun
 
     }
 
-    public void deleteSpecificStudentNotification(String studentNumber, String eventId) {
+    public void deleteSpecificStudentNotification(String studentId, String eventId) {
 
-        if (studentNumber == null || eventId == null || studentNumber.isEmpty() || eventId.isEmpty()) {
+        if (studentId == null || eventId == null ||studentId.isEmpty() || eventId.isEmpty()) {
             throw new IllegalArgumentException("Student ID and Event ID cannot be null or empty");
         }
-        Query query = new Query(Criteria.where("studentNumber").is(studentNumber));
+        Query query = new Query(Criteria.where("id").is(studentId));
         BasicDBObject eventToRemove = new BasicDBObject("eventId", eventId);
 
         // Remove all matching events
