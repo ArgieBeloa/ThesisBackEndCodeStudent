@@ -38,6 +38,11 @@ public class StudentService {
 
        return studentRepository.findAll();
     }
+//    get student by object id
+public Optional<StudentModel> getById(String id) {
+    return studentRepository.findById(id);
+}
+
 
 //    get by student number
     public StudentModel getByStudentNumber(String studentNumber){

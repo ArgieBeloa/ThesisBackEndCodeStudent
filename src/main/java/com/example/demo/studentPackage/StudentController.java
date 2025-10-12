@@ -6,7 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 @RestController
@@ -18,6 +21,9 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
+    @Autowired
+    private  StudentRepository studentRepository;
+
 //    get all student Data
     @GetMapping("/allStudentData")
     public ResponseEntity<List <StudentModel> >getAllStudentData(){
@@ -26,13 +32,28 @@ public class StudentController {
         return new ResponseEntity<>(studentModels, HttpStatus.OK);
 
     }
+    @GetMapping("/id/{id}")
+    public ResponseEntity<?> getStudentByDbId(@PathVariable String id) {
+        Optional<StudentModel> student = studentService.getById(id);
 
-//    get specific student by student number
+        if (student.isPresent()) {
+            return ResponseEntity.ok(student.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Student not found with ID: " + id);
+        }
+    }
+
+
+
+    //    get specific student by student number
     @GetMapping("/{studentNumber}")
     public StudentModel getStudentById(@PathVariable String studentNumber){
 
         return studentService.getByStudentNumber(studentNumber);
     }
+
+
 
     @PostMapping("/login")
     public String studentLogin(@RequestBody StudentModel studentModel){
