@@ -45,6 +45,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // ✅ Skip JWT filtering for public endpoints
         if (path.contains("/api/students/login") ||
                 path.contains("/api/students/register") ||
+                path.contains("/api/admin/login") ||
                 path.contains("/api/admin/check-student")) {
             filterChain.doFilter(request, response);
             return;
