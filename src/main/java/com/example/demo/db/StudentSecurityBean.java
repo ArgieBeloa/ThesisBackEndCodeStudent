@@ -36,20 +36,26 @@ public class StudentSecurityBean {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-      return  httpSecurity
-
-                .csrf(customizer -> customizer.disable())
-              .cors(Customizer.withDefaults())
+        return httpSecurity
+                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers( "/api/students/login", "/api/students/register")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement((session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))
-              .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                        // ✅ Public endpoints (no JWT needed)
+                        .requestMatchers(
+                                "/api/students/login",
+                                "/api/students/register",
+                                "/api/admin/check-student"   // 👈 added admin check endpoint
+                        ).permitAll()
 
-         .build();
+                        // ✅ All other endpoints require JWT
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
+
 
 //    @Bean
 //    public UserDetailsService userDetailsService(){

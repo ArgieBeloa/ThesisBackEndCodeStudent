@@ -1,5 +1,6 @@
 package com.example.demo.studentPackage;
 
+import com.example.demo.db.SecurityUtils;
 import com.example.demo.eventPerformancedb.StudentEventAttended;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,10 +49,18 @@ public class StudentController {
 
     //    get specific student by student number
     @GetMapping("/{studentNumber}")
-    public StudentModel getStudentById(@PathVariable String studentNumber){
+    public ResponseEntity<?> getStudentData(@PathVariable String studentNumber) {
+        // 🧠 Only allow the same logged-in student to access their own data
+        if (!SecurityUtils.isOwner(studentNumber)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access denied: You can only access your own account");
+        }
 
-        return studentService.getByStudentNumber(studentNumber);
+        // ✅ Continue with your logic if the student is the owner
+        StudentModel student = studentRepository.getByStudentNumber(studentNumber);
+        return ResponseEntity.ok(student);
     }
+
 
 
 
