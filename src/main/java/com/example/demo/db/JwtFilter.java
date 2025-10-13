@@ -13,10 +13,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 /**
  * Global JWT filter for all secured endpoints.
+ * - Authenticates JWT tokens.
+ * - Prevents cross-student access.
+ * - Allows admins to bypass restrictions.
  */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -48,17 +52,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
         String token = null;
-        String studentNumber = null;
+        String username = null;
+        String role = null;
 
         try {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
-                studentNumber = jwtService.extractUserName(token);
+                username = jwtService.extractUserName(token);
+                role = jwtService.extractRole(token); // 👈 NEW: get role claim
             }
 
-            if (studentNumber != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = context.getBean(MyUserDetailsService.class)
-                        .loadUserByUsername(studentNumber);
+                        .loadUserByUsername(username);
 
                 if (jwtService.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken =
@@ -69,14 +75,14 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
 
-            // 🚫 Prevent cross-student access attempts
-            if (path.startsWith("/api/students/")) {
+            // 🚫 Prevent student cross-access (but allow admins)
+            if (path.startsWith("/api/students/") && !"ADMIN".equalsIgnoreCase(role)) {
                 String[] parts = path.split("/");
                 if (parts.length > 3) {
                     String targetParam = parts[3]; // /api/students/{id or studentNumber}/...
                     String currentUser = jwtService.extractUserName(token);
 
-                    // If the logged-in student tries to access another student's data
+                    // If a student tries to access another student's data
                     if (currentUser != null && !currentUser.equals(targetParam)) {
                         System.out.println("❌ Blocked cross access: " + currentUser + " → " + targetParam);
                         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -84,6 +90,14 @@ public class JwtFilter extends OncePerRequestFilter {
                         return;
                     }
                 }
+            }
+
+            // 🧱 Restrict all-student listing for non-admins
+            if (path.equals("/api/students/allStudentData") && !"ADMIN".equalsIgnoreCase(role)) {
+                System.out.println("❌ Blocked cross access: " + username + " tried to access allStudentData");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.getWriter().write("Access denied: Admin only");
+                return;
             }
 
         } catch (Exception e) {

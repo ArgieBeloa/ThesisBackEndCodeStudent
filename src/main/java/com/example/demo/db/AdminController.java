@@ -19,6 +19,9 @@ public class AdminController {
     @Autowired
     private StudentRepository studentRepository;
 
+    /**
+     * ✅ Admin key validation (used internally by login or other admin tools)
+     */
     @GetMapping("/check-student")
     public ResponseEntity<?> checkClient(
             @RequestHeader(value = "X-ADMIN-KEY", required = false) String adminKey,
@@ -37,15 +40,27 @@ public class AdminController {
         return ResponseEntity.ok(Map.of("exists", exists));
     }
 
+    /**
+     * ✅ Admin login endpoint — returns JWT token with role = ADMIN
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> adminLogin(
+            @RequestHeader(value = "X-ADMIN-KEY", required = false) String adminKey
+    ) {
+        System.out.println("🔑 [Admin Login] Received key: " + adminKey);
 
-/*
- const res = await axios.get(`${BASE_URL}/api/admin/check-client`, {
-  headers: { "X-ADMIN-KEY": "Capstone_Admin_2025" },
-  params: { studentNumber: "2025-0001" },
-});
+        // Validate admin key
+        if (!jwtService.isAdminKey(adminKey)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid admin key"));
+        }
 
-console.log(res.data); // { exists: true }
+        // Generate ADMIN token
+        String token = jwtService.generateToken("admin", "ADMIN");
 
-
- */
+        return ResponseEntity.ok(Map.of(
+                "message", "Admin authenticated successfully",
+                "token", token
+        ));
+    }
 }

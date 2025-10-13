@@ -20,7 +20,6 @@ import java.util.function.Function;
 @Service
 public class JWTService {
 
-    // ✅ Automatically read from application.properties / Render environment
     @Value("${app.admin.key:default_admin_key}")
     private String adminKey;
 
@@ -30,7 +29,6 @@ public class JWTService {
     private final String fallbackSecret;
 
     public JWTService() {
-        // Generate fallback key in case env var is missing
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
             SecretKey sk = keyGen.generateKey();
@@ -45,9 +43,11 @@ public class JWTService {
         return key != null && key.trim().equals(adminKey.trim());
     }
 
-    // ✅ Token generation
-    public String generateToken(String username) {
+    // ✅ Token generation with role
+    public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role); // 👈 Add role claim
+
         return Jwts.builder()
                 .claims()
                 .add(claims)
@@ -59,18 +59,26 @@ public class JWTService {
                 .compact();
     }
 
-    // ✅ Key resolver
-    private SecretKey getKey() {
-        String keyToUse = (jwtSecret != null && !jwtSecret.isEmpty()) ? jwtSecret : fallbackSecret;
-        byte[] keyBytes = Decoders.BASE64.decode(keyToUse);
-        return Keys.hmacShaKeyFor(keyBytes);
+    // 🧩 Backward-compatible overload (defaults to STUDENT)
+    public String generateToken(String username) {
+        return generateToken(username, "STUDENT");
     }
 
-    // ✅ Claims extraction
+    // ✅ Extract role from JWT
+    public String extractRole(String token) {
+        try {
+            return extractAllClaims(token).get("role", String.class);
+        } catch (Exception e) {
+            return null; // No role claim present
+        }
+    }
+
+    // ✅ Extract username (studentNumber)
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    // ✅ Generic claim extractor
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
@@ -96,5 +104,12 @@ public class JWTService {
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    // ✅ Key resolver
+    private SecretKey getKey() {
+        String keyToUse = (jwtSecret != null && !jwtSecret.isEmpty()) ? jwtSecret : fallbackSecret;
+        byte[] keyBytes = Decoders.BASE64.decode(keyToUse);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
