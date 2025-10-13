@@ -44,7 +44,8 @@ public class StudentSecurityBean {
                         .requestMatchers(
                                 "/api/students/login",
                                 "/api/students/register",
-                                "/api/admin/check-student"   // 👈 added admin check endpoint
+                                "/api/admin/check-student",
+                                "/api/admin/login"// 👈 added admin check endpoint
                         ).permitAll()
 
                         // ✅ All other endpoints require JWT
